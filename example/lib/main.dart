@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
@@ -83,47 +83,33 @@ class _MyAppState extends State<MyApp> {
               : PDFViewer(
                   document: document,
                   zoomSteps: 1,
-                  //uncomment below line to preload all pages
-                  // lazyLoad: false,
-                  // uncomment below line to scroll vertically
-                  // scrollDirection: Axis.vertical,
-
-                  //uncomment below code to replace bottom navigation with your own
-                  /* navigationBuilder:
-                      (context, page, totalPages, jumpToPage, animateToPage) {
-                    return ButtonBar(
-                      alignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(Icons.first_page),
-                          onPressed: () {
-                            jumpToPage()(page: 0);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () {
-                            animateToPage(page: page - 2);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.arrow_forward),
-                          onPressed: () {
-                            animateToPage(page: page);
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.last_page),
-                          onPressed: () {
-                            jumpToPage(page: totalPages - 1);
-                          },
-                        ),
-                      ],
-                    );
-                  }, */
-                ),
+                  controlsBuilder: _buildControls),
         ),
       ),
     );
+  }
+
+  Widget _buildControls(PdfViewerControls controls) {
+    return Positioned(
+        left: 0,
+        bottom: 36,
+        right: 0,
+        child: Row(
+          children: [
+            IconButton(
+                onPressed: controls.onChangedOrientation,
+                icon: Icon(Icons.portrait)),
+            IconButton(
+                onPressed: controls.zoom,
+                icon: Icon(
+                  Icons.zoom_in,
+                )),
+            IconButton(
+                onPressed: controls.unzoom,
+                icon: Icon(
+                  Icons.zoom_out,
+                ))
+          ],
+        ));
   }
 }

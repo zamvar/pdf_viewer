@@ -19,6 +19,8 @@ class PDFPage extends StatefulWidget {
   final double minScale;
   final double maxScale;
   final double panLimit;
+  final EventTrigger zoomEventTrigger;
+  final EventTrigger unZoomEventTrigger;
   PDFPage(
     this.imgPath,
     this.num, {
@@ -27,6 +29,8 @@ class PDFPage extends StatefulWidget {
     this.minScale = 1.0,
     this.maxScale = 5.0,
     this.panLimit = 1.0,
+    required this.zoomEventTrigger,
+    required this.unZoomEventTrigger,
   });
 
   @override
@@ -68,6 +72,8 @@ class _PDFPageState extends State<PDFPage> {
           minScale: widget.minScale,
           panLimit: widget.panLimit,
           maxScale: widget.maxScale,
+          unZoomEventTrigger: widget.unZoomEventTrigger,
+          zoomEventTrigger: widget.zoomEventTrigger,
           child: Image(image: provider),
         ));
   }

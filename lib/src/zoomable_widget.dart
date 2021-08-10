@@ -26,21 +26,9 @@ class ZoomableWidget extends StatefulWidget {
     this.onZoomChanged,
     this.resetDuration: const Duration(milliseconds: 250),
     this.resetCurve: Curves.easeInOut,
-  })  : assert(minScale != null),
-        assert(maxScale != null),
-        assert(initialScale != null),
-        assert(initialOffset != null),
-        assert(initialRotation != null),
-        assert(enableZoom != null),
-        assert(panLimit != null),
-        assert(singleFingerPan != null),
-        assert(multiFingersPan != null),
-        assert(enableRotate != null),
-        assert(zoomSteps != null),
-        assert(autoCenter != null),
-        assert(bounceBackBoundary != null),
-        assert(enableFling != null),
-        assert(flingFactor != null);
+    required this.zoomEventTrigger,
+    required this.unZoomEventTrigger,
+  });
 
   /// The minimum size for scaling.
   final double minScale;
@@ -101,6 +89,8 @@ class ZoomableWidget extends StatefulWidget {
 
   /// The curve of reset animation.
   final Curve resetCurve;
+  final EventTrigger zoomEventTrigger;
+  final EventTrigger unZoomEventTrigger;
 
   @override
   _ZoomableWidgetState createState() => _ZoomableWidgetState();
@@ -129,11 +119,35 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
     _zoom = widget.initialScale;
     _pan = widget.initialOffset;
     _rotation = widget.initialRotation;
+    widget.zoomEventTrigger.addListener(_zoomPage);
+    widget.unZoomEventTrigger.addListener(_unzoomPage);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.zoomEventTrigger.removeListener(_zoomPage);
+    widget.unZoomEventTrigger.removeListener(_unzoomPage);
+  }
+
+  void _zoomPage() {
+    setState(() {
+      _previousZoom = _zoom;
+      _zoom = _zoom * 1.1;
+    });
+  }
+
+  void _unzoomPage() {
+    setState(() {
+      _previousZoom = _zoom;
+      _zoom = _zoom * .9;
+    });
   }
 
   void _onScaleStart(ScaleStartDetails details) {
     if (_childSize == Size.zero) {
-      final RenderBox renderbox = _key.currentContext!.findRenderObject() as RenderBox;
+      final RenderBox renderbox =
+          _key.currentContext!.findRenderObject() as RenderBox;
       _childSize = renderbox.size;
     }
     setState(() {
@@ -352,7 +366,8 @@ class _ZoomableChildState extends AnimatedWidgetBaseState<_ZoomableChild> {
   @override
   void forEachTween(visitor) {
     _zoom = visitor(
-        _zoom, widget.zoom, (dynamic value) => DoubleTween(begin: value)) as DoubleTween?;
+            _zoom, widget.zoom, (dynamic value) => DoubleTween(begin: value))
+        as DoubleTween?;
     _panOffset = visitor(_panOffset, widget.panOffset,
         (dynamic value) => OffsetTween(begin: value)) as OffsetTween?;
     _rotation = visitor(_rotation, widget.rotation,
@@ -389,4 +404,18 @@ class OffsetTween extends Tween<Offset?> {
 
   @override
   Offset lerp(double t) => (begin! + (end! - begin!) * t);
+}
+
+class EventTrigger extends ValueNotifier<String> {
+  EventTrigger(String value) : super(value);
+
+  @override
+  String get value => super.value;
+  set user(String currentValue) {
+    value = currentValue;
+  }
+
+  void trigger() {
+    value = DateTime.now().toIso8601String();
+  }
 }

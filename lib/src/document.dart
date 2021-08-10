@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:advance_pdf_viewer/src/zoomable_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:advance_pdf_viewer/src/page.dart';
@@ -83,7 +84,9 @@ class PDFDocument {
   /// Load specific page
   ///
   /// [page] defaults to `1` and must be equal or above it
-  Future<PDFPage> get({
+  Future<PDFPage> get(
+    EventTrigger zoomEventTrigger,
+    EventTrigger unZoomEventTrigger, {
     int page = 1,
     final Function(double)? onZoomChanged,
     final int? zoomSteps,
@@ -98,6 +101,8 @@ class PDFDocument {
     return new PDFPage(
       data,
       page,
+      zoomEventTrigger: zoomEventTrigger,
+      unZoomEventTrigger: unZoomEventTrigger,
       onZoomChanged: onZoomChanged,
       zoomSteps: zoomSteps ?? 3,
       minScale: minScale ?? 1.0,
@@ -106,7 +111,9 @@ class PDFDocument {
     );
   }
 
-  Future<void> preloadPages({
+  Future<void> preloadPages(
+    EventTrigger zoomEventTrigger,
+    EventTrigger unZoomEventTrigger, {
     final Function(double)? onZoomChanged,
     final int? zoomSteps,
     final double? minScale,
@@ -120,6 +127,8 @@ class PDFDocument {
       _pages.add(PDFPage(
         data,
         countvar,
+        zoomEventTrigger: zoomEventTrigger,
+        unZoomEventTrigger: unZoomEventTrigger,
         onZoomChanged: onZoomChanged,
         zoomSteps: zoomSteps ?? 3,
         minScale: minScale ?? 1.0,
@@ -132,7 +141,9 @@ class PDFDocument {
   }
 
   // Stream all pages
-  Stream<PDFPage?> getAll({final Function(double)? onZoomChanged}) {
+  Stream<PDFPage?> getAll(
+      EventTrigger zoomEventTrigger, EventTrigger unZoomEventTrigger,
+      {final Function(double)? onZoomChanged}) {
     return Future.forEach<PDFPage?>(List.filled(count, null), (i) async {
       print(i);
       final data = await _channel
@@ -140,6 +151,8 @@ class PDFDocument {
       return new PDFPage(
         data,
         1,
+        zoomEventTrigger: zoomEventTrigger,
+        unZoomEventTrigger: unZoomEventTrigger,
         onZoomChanged: onZoomChanged,
       );
     }).asStream() as Stream<PDFPage?>;
