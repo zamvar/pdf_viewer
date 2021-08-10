@@ -149,17 +149,13 @@ class _PDFViewerState extends State<PDFViewer> {
   // }
 
   void _previousPage() {
-    if (_pageNumber <= 1) {
-      _animateToPage(page: widget.document.count - 1);
-    } else
-      _animateToPage(page: _pageNumber - 1);
+    _pageController.previousPage(
+        duration: animationDuration, curve: animationCurve);
   }
 
   void _nextPage() {
-    if (_pageNumber >= widget.document.count) {
-      _animateToPage(page: 1);
-    } else
-      _animateToPage(page: _pageNumber + 1);
+    _pageController.nextPage(
+        duration: animationDuration, curve: animationCurve);
   }
 
   void _zoom() {
